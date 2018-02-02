@@ -1,0 +1,53 @@
+.calendar-container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /*align-content: center;*/
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: 2 0 auto;
+
+    background: red;
+    padding: 0 40px;
+    color: #fff;
+}
+
+.weekday-names {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex: .5 0 auto;
+
+    background: #F7817E;
+}
+
+.weekday-names div {
+    width: 12.28%;
+}
+
+
+.weeksContainer {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+
+    flex: 48 1 auto;
+
+}
+
+.weeksContainer .day {
+    width: 12.28%;
+    flex: 1 auto;
+    background: lightgray;
+    border-top: 1px solid grey;
+    padding: 1%;
+
+}
+
