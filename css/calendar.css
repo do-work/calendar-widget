@@ -48,6 +48,9 @@
     background: lightgray;
     border-top: 1px solid grey;
     padding: 1%;
+}
 
+.selected {
+    background: #358ADD;
 }
 
