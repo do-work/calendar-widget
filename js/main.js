@@ -25,60 +25,80 @@ class Dates {
         this.lastMonth = document.getElementById('last-month');
 
         this.month = ["January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December"];
+            "August", "September", "October", "November", "December", "January"];
         this.todayDate = new Date();
         this.monthNum = this.todayDate.getMonth();
         this.thisYear = this.todayDate.getFullYear();
-
     }
 
     selectedMonthInitial() {
         this.selectedMonth.innerHTML = this.month[this.monthNum] + " " + this.thisYear;
+        return new Date();
     }
-
 
     nextMonthInitial() {
         let nextMonth = this.todayDate.getMonth() + 1;
+
         if (nextMonth === 12) {
             this.nextMonth.innerHTML = this.month[0];
-            let date = new Date();
-            let year = date.getFullYear();
-            let month = date.getMonth();
-            month.setMonth(0);
-            let day = date.getDate();
-            return new Date(year + 1, month, day);
+            this.monthNum.setMonth(0);
+            return new Date(this.thisYear + 1);
         } else {
             this.nextMonth.innerHTML = this.month[nextMonth];
-            let date = new Date();
-            let year = date.getFullYear();
-            let month = date.getMonth();
-            let day = date.getDate();
-            return new Date(year, month + 1, day);
+            return new Date(this.thisYear, this.monthNum);
         }
     }
 
-    changeSelectedMonthToNextMonth() {
+    lastMonthInitial() {
+        let lastMonth = this.todayDate.getMonth() - 1;
+        if (lastMonth === -1) {
+            this.lastMonth.innerHTML = this.month[11];
+            this.monthNum.setMonth(11);
+            return new Date(this.thisYear - 1);
+        } else {
+            this.lastMonth.innerHTML = this.month[lastMonth];
+            return new Date(this.thisYear, this.monthNum);
+        }
+
+    }
+
+    changeSelectedMonth() {
+        let nextMonthFullDate = this.nextMonthInitial();
+        let selectedMonthFullDate = this.selectedMonthInitial();
+        let lastMonthFullDate = this.lastMonthInitial();
+
         this.nextMonth.addEventListener('click', () => {
-            let nextMonthDate = this.nextMonthInitial();
-            this.selectedMonth.innerHTML = this.month[nextMonthDate.getMonth()] + " " + nextMonthDate.getFullYear();
+            nextMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
+            selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
+            if (selectedMonthFullDate.getMonth() === 0) {
+                this.lastMonth.innerHTML = this.month[11];
+            } else {
+                this.lastMonth.innerHTML = this.month[selectedMonthFullDate.getMonth() - 1];
+            }
+
+            this.selectedMonth.innerHTML = this.month[nextMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
+            this.nextMonth.innerHTML = this.month[nextMonthFullDate.getMonth() + 1];
+            return selectedMonthFullDate;
+
+        });
+
+        this.lastMonth.addEventListener('click', () => {
+            lastMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
+            selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
+            if (selectedMonthFullDate.getMonth() === 0) {
+                this.lastMonth.innerHTML = this.month[11];
+            } else {
+                this.lastMonth.innerHTML = this.month[lastMonthFullDate.getMonth() - 1];
+            }
+            this.selectedMonth.innerHTML = this.month[lastMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
+            this.nextMonth.innerHTML = this.month[lastMonthFullDate.getMonth() + 1];
+            return selectedMonthFullDate;
+
+
         })
     }
 
-    setNextMonth() {
-        if (this.month[this.monthNum + 1] < 12) {
-            this.nextMonth.innerHTML = this.month[this.monthNum + 1];
-        } else if (this.month[this.monthNum + 1] === 12) {
-            let nextYear = this.nextMonth.innerHTML = this.month[0];
-            this.thisYear = this.thisYear + 1;
 
-        }
-
-    }
-
-    displayLastMonth() {
-        this.lastMonth.innerHTML = this.month[this.monthNum - 1];
-
-    }
 }
 
 
@@ -86,7 +106,6 @@ addDayListener();
 date = new Dates();
 date.selectedMonthInitial();
 date.nextMonthInitial();
-date.displayLastMonth();
-date.changeSelectedMonthToNextMonth();
-
+date.lastMonthInitial();
+date.changeSelectedMonth();
 
