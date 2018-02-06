@@ -1,23 +1,3 @@
-function addDayListener() {
-    let daysArr = document.getElementsByClassName('day');
-    let targetArr = [];
-    for (let i = 0; i < daysArr.length; i++) {
-        daysArr[i].addEventListener('click', (event) => {
-            let target = event.target;
-            targetArr.push(target);
-
-            for (let i = 0; i < targetArr.length; i++) {
-                targetArr[i].style.background = "lightgray";
-            }
-
-            target.style.background = "blue";
-            target.classList.add("selected");
-
-        });
-    }
-}
-
-
 class Dates {
     constructor() {
         this.selectedMonth = document.getElementById('selected-month');
@@ -29,6 +9,26 @@ class Dates {
         this.todayDate = new Date();
         this.monthNum = this.todayDate.getMonth();
         this.thisYear = this.todayDate.getFullYear();
+        this.selectedMonthFullDate = this.selectedMonthInitial();
+    }
+
+    selectDay() {
+        let daysArr = document.getElementsByClassName('day');
+        let targetArr = [];
+        for (let i = 0; i < daysArr.length; i++) {
+            daysArr[i].addEventListener('click', (event) => {
+                let target = event.target;
+                targetArr.push(target);
+
+                for (let i = 0; i < targetArr.length; i++) {
+                    targetArr[i].style.background = "lightgray";
+                }
+
+                target.style.background = "blue";
+                target.classList.add("selected");
+
+            });
+        }
     }
 
     selectedMonthInitial() {
@@ -62,11 +62,9 @@ class Dates {
 
     }
 
-    changeSelectedMonth() {
+    changeSelectedMonthFromNextMonth() {
         let nextMonthFullDate = this.nextMonthInitial();
-        let selectedMonthFullDate = this.selectedMonthInitial();
-        let lastMonthFullDate = this.lastMonthInitial();
-
+        let selectedMonthFullDate = this.selectedMonthFullDate;
         this.nextMonth.addEventListener('click', () => {
             nextMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
             selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
@@ -75,12 +73,17 @@ class Dates {
             } else {
                 this.lastMonth.innerHTML = this.month[selectedMonthFullDate.getMonth() - 1];
             }
-
             this.selectedMonth.innerHTML = this.month[nextMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
             this.nextMonth.innerHTML = this.month[nextMonthFullDate.getMonth() + 1];
-            return selectedMonthFullDate;
 
+            this.setDaysForSelectedMonth();
+            return selectedMonthFullDate;
         });
+    }
+
+    changeSelectedMonthFromLastMonth() {
+        let lastMonthFullDate = this.lastMonthInitial();
+        let selectedMonthFullDate = this.selectedMonthFullDate;
 
         this.lastMonth.addEventListener('click', () => {
             lastMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
@@ -92,20 +95,34 @@ class Dates {
             }
             this.selectedMonth.innerHTML = this.month[lastMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
             this.nextMonth.innerHTML = this.month[lastMonthFullDate.getMonth() + 1];
+
+            this.setDaysForSelectedMonth();
             return selectedMonthFullDate;
-
-
         })
+    }
+
+    setDaysForSelectedMonth() {
+        let htmlDateArr = document.getElementsByClassName("day");
+        let daysInSelectedMonth = new Date(this.selectedMonthFullDate.getFullYear(), this.selectedMonthFullDate.getMonth() + 1, 0).getDate();
+        let dayNumberForFirstOfMonth = new Date(this.selectedMonthFullDate.getFullYear(), this.selectedMonthFullDate.getMonth()).getDay();
+
+            for (let i = 0; i < daysInSelectedMonth; i++) {
+                htmlDateArr[dayNumberForFirstOfMonth + i].innerHTML = i + 1;
+                htmlDateArr[dayNumberForFirstOfMonth + i].addEventListener('click', () => {
+                    console.log(new Date(this.selectedMonthFullDate.getFullYear(), this.selectedMonthFullDate.getMonth(), i + 1));
+                })
+            }
     }
 
 
 }
 
-
-addDayListener();
 date = new Dates();
+date.selectDay();
 date.selectedMonthInitial();
 date.nextMonthInitial();
 date.lastMonthInitial();
-date.changeSelectedMonth();
+date.changeSelectedMonthFromNextMonth();
+date.changeSelectedMonthFromLastMonth();
+date.setDaysForSelectedMonth();
 
