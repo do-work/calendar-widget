@@ -1,114 +1,151 @@
-class Dates {
-    constructor() {
-        this.selectedMonth = document.getElementById('selected-month');
-        this.nextMonth = document.getElementById('next-month');
-        this.lastMonth = document.getElementById('last-month');
+let monthArr = ["January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December", "January"];
 
-        this.month = ["January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December", "January"];
-    }
+function applyListener(element, type = 'click', callback) {
+    return element.addEventListener(type, callback);
+}
 
-    selectDay() {
-        let daysArr = document.getElementsByClassName('day');
-        let targetArr = [];
-        for (let i = 0; i < daysArr.length; i++) {
-            daysArr[i].addEventListener('click', (event) => {
-                let target = event.target;
-                targetArr.push(target);
+function setBackground(element, color) {
+    return element.style.background = color;
+}
 
-                for (let i = 0; i < targetArr.length; i++) {
-                    targetArr[i].style.background = "lightgray";
-                }
+function setElementClassName(element, className) {
+    return element.classList.add(className);
+}
 
-                target.style.background = "blue";
-                target.classList.add("selected");
+function selectElements(element, newElementBackground = 'blue', newElementClass) {
+    let targetArr = [];
+    for (let i = 0; i < element.length; i++) {
+        applyListener(element[i], 'click', (event) => {
+            let target = event.target;
 
-            });
-        }
-    }
-
-    selectedDate(date = new Date()) {
-        let selectedDate = date;
-        this.selectedMonth.innerHTML = this.month[selectedDate.getMonth()] + " " + selectedDate.getFullYear();
-        //todo runs 7 times because everything else is calling this...runs once in global though
-        // this.setDaysForSelectedMonth(selectedDate);
-        return selectedDate;
-    }
-
-    nextMonthDate() {
-        let selectedMonth = this.selectedDate();
-        let nextMonthFullDate = new Date (selectedMonth.getFullYear(), selectedMonth.getMonth() + 1);
-        let nextMonth = nextMonthFullDate.getMonth();
-        this.nextMonth.innerHTML = this.month[nextMonth];
-        return nextMonthFullDate;
-    }
-
-    lastMonthDate() {
-        let selectedMonth = this.selectedDate();
-        let lastMonthFullDate = new Date (selectedMonth.getFullYear(), selectedMonth.getMonth() - 1);
-        let lastMonth = lastMonthFullDate.getMonth();
-        this.lastMonth.innerHTML = this.month[lastMonth];
-        return lastMonthFullDate;
-    }
-
-    //todo fix month on clicks to jump in sequence
-    changeSelectedMonthFromNextMonth() {
-        let lastMonthFullDate = this.lastMonthDate();
-        let selectedMonthFullDate = this.selectedDate();
-        let nextMonthFullDate = this.nextMonthDate();
-
-        this.nextMonth.addEventListener('click', () => {
-            nextMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
-            selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
-            if (selectedMonthFullDate.getMonth() === 0) {
-                this.lastMonth.innerHTML = this.month[11];
-            } else {
-                this.lastMonth.innerHTML = this.month[selectedMonthFullDate.getMonth() - 1];
+            targetArr.push(target);
+            for (let i = 0; i < targetArr.length; i++) {
+                setBackground(targetArr[i], 'lightgray');
             }
-            this.selectedMonth.innerHTML = this.month[nextMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
-            this.nextMonth.innerHTML = this.month[nextMonthFullDate.getMonth() + 1];
 
-            this.setDaysForSelectedMonth(selectedMonthFullDate);
-            return selectedMonthFullDate;
-        });
-    }
+            setBackground(event.target, newElementBackground);
+            setElementClassName(target, newElementClass);
 
-    changeSelectedMonthFromLastMonth() {
-        let lastMonthFullDate = this.lastMonthDate();
-        let selectedMonthFullDate = this.selectedDate();
-        let nextMonthFullDate = this.nextMonthDate();
-
-
-        this.lastMonth.addEventListener('click', () => {
-            lastMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
-            selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
-            if (selectedMonthFullDate.getMonth() === 0) {
-                this.lastMonth.innerHTML = this.month[11];
-            } else {
-                this.lastMonth.innerHTML = this.month[lastMonthFullDate.getMonth() - 1];
-            }
-            this.selectedMonth.innerHTML = this.month[lastMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
-            this.nextMonth.innerHTML = this.month[lastMonthFullDate.getMonth() + 1];
-
-            this.setDaysForSelectedMonth(selectedMonthFullDate);
-            return selectedMonthFullDate;
         })
+
+    }
+}
+
+
+let date = {
+    current: new Date(),
+
+    get selected() {
+        return this.current;
+    },
+
+    get selectedMonth() {
+        return this.selected.getMonth();
+    },
+
+    get selectedYear() {
+        return this.selected.getFullYear();
+    },
+
+    set selectedYear(year) {
+        return this.selected.setFullYear(year);
+    },
+
+    set selectedMonth(month) {
+        return this.selected.setMonth(month);
+    },
+
+    set selectedFullDate(arr) {
+        return this.selected.setFullYear(arr[0], arr[1]);
     }
 
-    setDaysForSelectedMonth(date) {
-        let selectedMonthFullDate = date ? date : this.selectedDate();
-        let daysInSelectedMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth() + 1, 0).getDate();
-        let dayNumberForFirstOfMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth()).getDay();
-        for (let i = 0; i < daysInSelectedMonth; i++) {
-            let htmlDateArr = [];
-            htmlDateArr = document.getElementsByClassName("day");
+};
 
-            htmlDateArr[dayNumberForFirstOfMonth + i].innerHTML = i + 1;
-            htmlDateArr[dayNumberForFirstOfMonth + i].addEventListener('click', () => {
-                let eachDayFullDate = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth(), i + 1);
-                console.log(eachDayFullDate);
-            })
+// function setSelectedDate(year = getSelectedDate().getFullYear(),
+//                          month = getSelectedDate().getMonth(),
+//                          day = getSelectedDate().getDate()) {
+//     let date = getSelectedDate();
+//     date.setFullYear(year);
+//     date.setMonth(month);
+//     date.setDate(day);
+//     return date;
+// }
+
+function getSelectedDate(date = new Date()) {
+    // this.setDaysForSelectedMonth(getSelectedDate);
+    return date;
+}
+
+
+function getNextMonthDate() {
+    // return new Date(getSelectedDate().getFullYear(), getSelectedDate().getMonth() + 1);
+    return new Date (date.selectedYear, date.selectedMonth + 1);
+
+}
+
+function getLastMonthDate() {
+    // return new Date(getSelectedDate().getFullYear(), getSelectedDate().getMonth() - 1);
+    return new Date (date.selectedYear, date.selectedMonth - 1);
+
+}
+
+//todo - after selecting lastMonth a few times, then selecting next month, it jumps far ahead
+function changeSelectedMonthFromNextMonth() {
+    let selectedMonthFullDate = getSelectedDate();
+    let nextMonthFullDate = getNextMonthDate();
+
+    nextMonth.addEventListener('click', () => {
+        nextMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
+        selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
+        if (selectedMonthFullDate.getMonth() === 0) {
+            lastMonth.innerHTML = monthArr[11];
+        } else {
+            lastMonth.innerHTML = monthArr[selectedMonthFullDate.getMonth() - 1];
         }
+        selectedMonth.innerHTML = monthArr[nextMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
+        nextMonth.innerHTML = monthArr[nextMonthFullDate.getMonth() + 1];
+
+        console.log(selectedMonthFullDate);
+        console.log(nextMonthFullDate);
+        return selectedMonthFullDate;
+    });
+}
+
+function changeSelectedMonthFromLastMonth() {
+    let lastMonthFullDate = getLastMonthDate();
+    let selectedMonthFullDate = getSelectedDate();
+
+    lastMonth.addEventListener('click', () => {
+        lastMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
+        selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
+        if (selectedMonthFullDate.getMonth() === 0) {
+            lastMonth.innerHTML = monthArr[11];
+        } else {
+            lastMonth.innerHTML = monthArr[lastMonthFullDate.getMonth() - 1];
+        }
+        selectedMonth.innerHTML = monthArr[lastMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
+        nextMonth.innerHTML = monthArr[lastMonthFullDate.getMonth() + 1];
+
+        console.log(selectedMonthFullDate);
+        console.log(lastMonthFullDate);
+        return selectedMonthFullDate;
+    })
+}
+
+function setDaysForSelectedMonth(date) {
+    let selectedMonthFullDate = date ? date : this.getSelectedDate();
+    let daysInSelectedMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth() + 1, 0).getDate();
+    let dayNumberForFirstOfMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth()).getDay();
+    for (let i = 0; i < daysInSelectedMonth; i++) {
+        let htmlDateArr = [];
+        htmlDateArr = document.getElementsByClassName("day");
+
+        htmlDateArr[dayNumberForFirstOfMonth + i].innerHTML = i + 1;
+        htmlDateArr[dayNumberForFirstOfMonth + i].addEventListener('click', () => {
+            let eachDayFullDate = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth(), i + 1);
+            console.log(eachDayFullDate);
+        })
     }
 
     //     let htmlDateArr = document.getElementsByClassName("day");
@@ -118,7 +155,7 @@ class Dates {
     //             let selectedDayNumber = htmlDateArr[i];
     //             // targetArr.push(target);
     //
-    //             let dayNumberForSelectedDate = new Date(this.selectedDate().getFullYear(), this.selectedDate().getMonth()).getDay(selectedDayNumber);
+    //             let dayNumberForSelectedDate = new Date(this.getSelectedDate().getFullYear(), this.getSelectedDate().getMonth()).getDay(selectedDayNumber);
     //             console.log(dayNumberForSelectedDate);
     //         })
     //     }
@@ -129,13 +166,21 @@ class Dates {
 
 }
 
-date = new Dates();
-date.selectDay();
-date.selectedDate();
-date.nextMonthDate();
-date.lastMonthDate();
-date.changeSelectedMonthFromNextMonth();
-date.changeSelectedMonthFromLastMonth();
+
+let dayElement = document.getElementsByClassName('day');
+let selectedMonth = document.getElementById('selected-month');
+let nextMonth = document.getElementById('next-month');
+let lastMonth = document.getElementById('last-month');
+
+
+selectElements(dayElement, '', 'selected');
+selectedMonth.innerHTML = monthArr[date.selectedMonth] + " " + date.selectedYear;
+nextMonth.innerHTML = monthArr[getNextMonthDate().getMonth()];
+lastMonth.innerHTML = monthArr[getLastMonthDate().getMonth()];
+
+changeSelectedMonthFromNextMonth();
+changeSelectedMonthFromLastMonth();
+
 // date.setDaysForSelectedMonth();
 // date.selectDayOfTheWeekFromDate();
 
