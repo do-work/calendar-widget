@@ -34,107 +34,100 @@ function selectElements(element, newElementBackground = 'blue', newElementClass)
 
 
 let date = {
-    current: new Date(),
+    initial: new Date(),
 
-    get selected() {
-        return this.current;
+    get selectedDate() {
+        let selectedDate = document.getElementById('selected-month').innerHTML;
+        let stringArr = selectedDate.split(" ");
+        return new Date(stringArr[1], monthArr.indexOf(stringArr[0]));
     },
 
-    get selectedMonth() {
-        return this.selected.getMonth();
+    get nextMonthDate() {
+        return new Date(this.selectedDate.setMonth(this.selectedDate.getMonth() + 1));
     },
 
-    get selectedYear() {
-        return this.selected.getFullYear();
+    get lastMonthDate() {
+        return new Date(this.selectedDate.setMonth(this.selectedDate.getMonth() - 1));
     },
 
-    set selectedYear(year) {
-        return this.selected.setFullYear(year);
+    set nextMonthDate(date) {
+        return new Date(this.nextMonthDate.setMonth(date.getMonth() + 1));
     },
 
-    set selectedMonth(month) {
-        return this.selected.setMonth(month);
-    },
-
-    set selectedFullDate(arr) {
-        return this.selected.setFullYear(arr[0], arr[1]);
+    set lastMonthDate(date) {
+        return new Date(this.lastMonthDate.setMonth(date.getMonth() - 1));
     }
-
 };
 
-// function setSelectedDate(year = getSelectedDate().getFullYear(),
-//                          month = getSelectedDate().getMonth(),
-//                          day = getSelectedDate().getDate()) {
-//     let date = getSelectedDate();
-//     date.setFullYear(year);
-//     date.setMonth(month);
-//     date.setDate(day);
-//     return date;
+
+// function getInitialDate() {
+//     // this.setDaysForSelectedMonth(getInitialDate);
+//     return new Date();
+// }
+//
+// function getSelectedDate() {
+//     let selectedDate = document.getElementById('selected-month').innerHTML;
+//     let stringArr = selectedDate.split(" ");
+//     return new Date(stringArr[1], monthArr.indexOf(stringArr[0]));
+// }
+//
+// function getNextMonthDate(date) {
+//     return new Date(getSelectedDate().setMonth(date.getMonth() + 1)); //return full date object
+// }
+//
+// function getLastMonthDate(date) {
+//     return new Date(date.setMonth(date.getMonth() - 1));
+//
 // }
 
-function getSelectedDate(date = new Date()) {
-    // this.setDaysForSelectedMonth(getSelectedDate);
-    return date;
-}
-
-
-function getNextMonthDate() {
-    // return new Date(getSelectedDate().getFullYear(), getSelectedDate().getMonth() + 1);
-    return new Date (date.selectedYear, date.selectedMonth + 1);
-
-}
-
-function getLastMonthDate() {
-    // return new Date(getSelectedDate().getFullYear(), getSelectedDate().getMonth() - 1);
-    return new Date (date.selectedYear, date.selectedMonth - 1);
-
-}
-
-//todo - after selecting lastMonth a few times, then selecting next month, it jumps far ahead
 function changeSelectedMonthFromNextMonth() {
-    let selectedMonthFullDate = getSelectedDate();
-    let nextMonthFullDate = getNextMonthDate();
+
+    let selectedMonth = document.getElementById('selected-month');
+    let nextMonth = document.getElementById('next-month');
+    let lastMonth = document.getElementById('last-month');
 
     nextMonth.addEventListener('click', () => {
-        nextMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
-        selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() + 1);
-        if (selectedMonthFullDate.getMonth() === 0) {
+        let newSelectedMonth = date.nextMonthDate;
+
+        if (newSelectedMonth.getMonth() === 0) {
             lastMonth.innerHTML = monthArr[11];
         } else {
-            lastMonth.innerHTML = monthArr[selectedMonthFullDate.getMonth() - 1];
+            lastMonth.innerHTML = monthArr[newSelectedMonth.getMonth() - 1];
         }
-        selectedMonth.innerHTML = monthArr[nextMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
-        nextMonth.innerHTML = monthArr[nextMonthFullDate.getMonth() + 1];
+        selectedMonth.innerHTML = monthArr[newSelectedMonth.getMonth()] + " " + newSelectedMonth.getFullYear();
 
-        console.log(selectedMonthFullDate);
-        console.log(nextMonthFullDate);
-        return selectedMonthFullDate;
+        let newNextMonth = date.nextMonthDate = newSelectedMonth;
+        nextMonth.innerHTML = monthArr[newNextMonth.getMonth() + 1];
+
+        return newSelectedMonth;
     });
 }
 
 function changeSelectedMonthFromLastMonth() {
-    let lastMonthFullDate = getLastMonthDate();
-    let selectedMonthFullDate = getSelectedDate();
+
+    let selectedMonth = document.getElementById('selected-month');
+    let nextMonth = document.getElementById('next-month');
+    let lastMonth = document.getElementById('last-month');
 
     lastMonth.addEventListener('click', () => {
-        lastMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
-        selectedMonthFullDate.setMonth(selectedMonthFullDate.getMonth() - 1);
-        if (selectedMonthFullDate.getMonth() === 0) {
+        let newSelectedMonth = date.lastMonthDate;
+
+        if (newSelectedMonth.getMonth() === 0) {
             lastMonth.innerHTML = monthArr[11];
         } else {
-            lastMonth.innerHTML = monthArr[lastMonthFullDate.getMonth() - 1];
+            lastMonth.innerHTML = monthArr[newSelectedMonth.getMonth() - 1];
         }
-        selectedMonth.innerHTML = monthArr[lastMonthFullDate.getMonth()] + " " + selectedMonthFullDate.getFullYear();
-        nextMonth.innerHTML = monthArr[lastMonthFullDate.getMonth() + 1];
+        selectedMonth.innerHTML = monthArr[newSelectedMonth.getMonth()] + " " + newSelectedMonth.getFullYear();
 
-        console.log(selectedMonthFullDate);
-        console.log(lastMonthFullDate);
-        return selectedMonthFullDate;
+        let newNextMonth = date.nextMonthDate = newSelectedMonth;
+        nextMonth.innerHTML = monthArr[newNextMonth.getMonth() + 1];
+
+        return newSelectedMonth;
     })
 }
 
 function setDaysForSelectedMonth(date) {
-    let selectedMonthFullDate = date ? date : this.getSelectedDate();
+    let selectedMonthFullDate = date ? date : this.getInitialDate();
     let daysInSelectedMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth() + 1, 0).getDate();
     let dayNumberForFirstOfMonth = new Date(selectedMonthFullDate.getFullYear(), selectedMonthFullDate.getMonth()).getDay();
     for (let i = 0; i < daysInSelectedMonth; i++) {
@@ -155,7 +148,7 @@ function setDaysForSelectedMonth(date) {
     //             let selectedDayNumber = htmlDateArr[i];
     //             // targetArr.push(target);
     //
-    //             let dayNumberForSelectedDate = new Date(this.getSelectedDate().getFullYear(), this.getSelectedDate().getMonth()).getDay(selectedDayNumber);
+    //             let dayNumberForSelectedDate = new Date(this.getInitialDate().getFullYear(), this.getInitialDate().getMonth()).getDay(selectedDayNumber);
     //             console.log(dayNumberForSelectedDate);
     //         })
     //     }
@@ -168,18 +161,19 @@ function setDaysForSelectedMonth(date) {
 
 
 let dayElement = document.getElementsByClassName('day');
-let selectedMonth = document.getElementById('selected-month');
+let selectedDate = document.getElementById('selected-month');
 let nextMonth = document.getElementById('next-month');
 let lastMonth = document.getElementById('last-month');
 
+// selectElements(dayElement, '', 'current');
+selectedDate.innerHTML = monthArr[date.initial.getMonth()] + " " + date.initial.getFullYear();
+nextMonth.innerHTML = monthArr[date.nextMonthDate.getMonth()];
+lastMonth.innerHTML = monthArr[date.lastMonthDate.getMonth()];
 
-selectElements(dayElement, '', 'selected');
-selectedMonth.innerHTML = monthArr[date.selectedMonth] + " " + date.selectedYear;
-nextMonth.innerHTML = monthArr[getNextMonthDate().getMonth()];
-lastMonth.innerHTML = monthArr[getLastMonthDate().getMonth()];
 
-changeSelectedMonthFromNextMonth();
 changeSelectedMonthFromLastMonth();
+changeSelectedMonthFromNextMonth();
+
 
 // date.setDaysForSelectedMonth();
 // date.selectDayOfTheWeekFromDate();
