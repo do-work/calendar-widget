@@ -11,43 +11,41 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    flex: 2 0 auto;
+    flex: 4 0 auto;
 
     background: red;
     padding: 0 40px;
     color: #fff;
 }
 
-.day-name-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    flex: .5 0 auto;
-
-    background: #F7817E;
-}
-
-.day-name-container div {
-    width: 12.28%;
-}
-
-
-.weeksContainer {
+.weeksContainer,
+.day-name-container
+{
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
+}
 
-    flex: 48 1 auto;
+.weeksContainer {
+    flex: 120 1 auto;
+}
 
+.day-name-container {
+    flex: 1 1 auto;
+    background: #F7817E;
+}
+
+.weeksContainer .day,
+.day-name-container .day-name
+{
+    width: 12.28%;
+    flex: 1 auto;
+    padding: 1%;
 }
 
 .weeksContainer .day {
-    width: 12.28%;
-    flex: 1 auto;
     background: lightgray;
     border-top: 1px solid grey;
-    padding: 1%;
 }
 
 .selected {
