@@ -31,49 +31,54 @@ function setBackground(element, color) {
     return element.style.background = color;
 }
 
+function clearElementBackground(elementArr, color) {
+    for (let i = 0; i < elementArr.length; i++) {
+        setBackground(elementArr[i], color);
+    }
+}
+
 function selectElements(element, color) {
     let targetArr = [];
     for (let i = 0; i < element.length; i++) {
         element[i].addEventListener('click', (event) => {
             let target = event.target;
+            let dayFullDate = new Date(date.selectedDate.getFullYear(), date.selectedDate.getMonth(), event.target.innerHTML);
+            // let dayNumber = dayFullDate.getDay();
 
             targetArr.push(target);
             for (let i = 0; i < targetArr.length; i++) {
                 setBackground(targetArr[i], 'lightgray');
             }
 
+            selectDayOfWeek(dayFullDate);
             setBackground(target, color);
         })
     }
 }
 
+function selectDayOfWeek(date) {
+    let dayNumber = date.getDay();
+    clearElementBackground(dayNameElementArr, '#F7817E');
+    setBackground(dayNameElementArr[dayNumber], "blue");
 
-function clearElementBackground(clickElement, elementArr, color) {
-    clickElement.addEventListener('click', () => {
-        for (let i = 0; i < elementArr.length; i++) {
-            setBackground(elementArr[i], color);
-        }
-    })
-}
-
-function getSelectedDayFullDate(element) {
-    for (let i = 0; i < element.length; i++) {
-        element[i].addEventListener('click', (event) => {
-            let dayFullDate = new Date(date.selectedDate.getFullYear(), date.selectedDate.getMonth(), event.target.innerHTML);
-            let dayNumber = dayFullDate.getDay();
-                for (let i = 0; i < element.length; i++){
-                    clearElementBackground(element[i], dayNameElementArr, "#F7817E");
-                }
-            setBackground(dayNameElementArr[dayNumber], 'blue');
-        })
-    }
 }
 
 
-function changeSelectedMonthFromNextMonth() {
-    let selectedMonthElement = document.getElementById('selected-month');
-    let nextMonthElement = document.getElementById('next-month');
-    let lastMonthElement = document.getElementById('last-month');
+// function getSelectedDayFullDate(element) {
+//     for (let i = 0; i < element.length; i++) {
+//         element[i].addEventListener('click', (event) => {
+//             let dayFullDate = new Date(date.selectedDate.getFullYear(), date.selectedDate.getMonth(), event.target.innerHTML);
+//             let dayNumber = dayFullDate.getDay();
+//             for (let i = 0; i < element.length; i++) {
+//                 clearElementBackground(element[i], dayNameElementArr, "#F7817E");
+//             }
+//             setBackground(dayNameElementArr[dayNumber], 'blue');
+//         })
+//     }
+// }
+
+
+function changeSelectedMonthFromNextMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr) {
 
     nextMonthElement.addEventListener('click', () => {
         let newSelectedMonth = date.nextMonthDate;
@@ -88,16 +93,16 @@ function changeSelectedMonthFromNextMonth() {
         let newNextMonth = date.nextMonthDate = newSelectedMonth;
         nextMonthElement.innerHTML = monthArr[newNextMonth.getMonth() + 1];
 
+        clearElementBackground(dayElementArr, 'lightgray');
+        clearElementBackground(dayNameElementArr, '#F7817E');
+
         setDaysForMonth(date.selectedDate);
 
         return newSelectedMonth;
     });
 }
 
-function changeSelectedMonthFromLastMonth() {
-    let selectedMonthElement = document.getElementById('selected-month');
-    let nextMonthElement = document.getElementById('next-month');
-    let lastMonthElement = document.getElementById('last-month');
+function changeSelectedMonthFromLastMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr) {
 
     lastMonthElement.addEventListener('click', () => {
         let newSelectedMonth = date.lastMonthDate;
@@ -112,13 +117,15 @@ function changeSelectedMonthFromLastMonth() {
         let newNextMonth = date.nextMonthDate = newSelectedMonth;
         nextMonthElement.innerHTML = monthArr[newNextMonth.getMonth() + 1];
 
+        clearElementBackground(dayElementArr, 'lightgray');
+        clearElementBackground(dayNameElementArr, '#F7817E');
+
         setDaysForMonth(date.selectedDate);
 
         return newSelectedMonth;
     })
 }
 
-//todo would this be better in my custom date object?
 function daysInMonth(date) {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 }
@@ -159,27 +166,23 @@ function setDaysForMonth(date) {
 //todo move into my date object?
 let dayElementArr = document.getElementsByClassName('day');
 let dayNameElementArr = document.getElementsByClassName('day-name');
-let selectedDate = document.getElementById('selected-month');
-let nextMonth = document.getElementById('next-month');
-let lastMonth = document.getElementById('last-month');
+let selectedMonthElement = document.getElementById('selected-month');
+let nextMonthElement = document.getElementById('next-month');
+let lastMonthElement = document.getElementById('last-month');
 
-selectedDate.innerHTML = monthArr[date.initial.getMonth()] + " " + date.initial.getFullYear();
-nextMonth.innerHTML = monthArr[date.nextMonthDate.getMonth()];
-lastMonth.innerHTML = monthArr[date.lastMonthDate.getMonth()];
+selectedMonthElement.innerHTML = monthArr[date.initial.getMonth()] + " " + date.initial.getFullYear();
+nextMonthElement.innerHTML = monthArr[date.nextMonthDate.getMonth()];
+lastMonthElement.innerHTML = monthArr[date.lastMonthDate.getMonth()];
 
-
-selectElements(dayElementArr, "blue");
-clearElementBackground(nextMonth, dayElementArr, 'lightgray');
-clearElementBackground(lastMonth, dayElementArr, 'lightgray');
-
-changeSelectedMonthFromLastMonth();
-changeSelectedMonthFromNextMonth();
-
-daysInMonth(date.lastMonthDate);
-
+// set initial month days and allow all day elements to be selected
 setDaysForMonth(date.selectedDate, dayElementArr);
+selectElements(dayElementArr, "blue");
 
-getSelectedDayFullDate(dayElementArr);
+changeSelectedMonthFromNextMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr);
+changeSelectedMonthFromLastMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr);
+
+
+// getSelectedDayFullDate(dayElementArr);
 
 
 // date.selectDayOfTheWeekFromDate();
