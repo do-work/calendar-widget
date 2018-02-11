@@ -18,7 +18,7 @@
     color: #fff;
 }
 
-.weekday-names {
+.day-name-container {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -28,7 +28,7 @@
     background: #F7817E;
 }
 
-.weekday-names div {
+.day-name-container div {
     width: 12.28%;
 }
 
