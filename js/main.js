@@ -50,7 +50,7 @@ function selectElements(element, color) {
             // let dayNumber = dayFullDate.getDay();
 
             if ((target.classList.contains('last-month-overflow') || target.classList.contains('next-month-overflow')) === false)
-            targetArr.push(target);
+                targetArr.push(target);
             for (let i = 0; i < targetArr.length; i++) {
                 setBackground(targetArr[i], 'lightgray');
             }
@@ -68,29 +68,9 @@ function selectDayOfWeek(date) {
 
 }
 
-function changeSelectedMonthFromNextMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr) {
+function changeSelectedMonthFromNextMonth(clickElement) {
+    clickElement.addEventListener('click', nextMonthHandler);
 
-    nextMonthElement.addEventListener('click', () => {
-        let newSelectedMonth = date.nextMonthDate;
-
-        if (newSelectedMonth.getMonth() === 0) {
-            lastMonthElement.innerHTML = monthArr[11];
-        } else {
-            lastMonthElement.innerHTML = monthArr[newSelectedMonth.getMonth() - 1];
-        }
-        selectedMonthElement.innerHTML = monthArr[newSelectedMonth.getMonth()] + " " + newSelectedMonth.getFullYear();
-
-        let newNextMonth = date.nextMonthDate = newSelectedMonth;
-        nextMonthElement.innerHTML = monthArr[newNextMonth.getMonth() + 1];
-
-        clearElementArrBackground(dayElementArr, 'lightgray');
-        clearElementArrBackground(dayNameElementArr, '#F7817E');
-
-        setDaysForMonth(date.selectedDate);
-        setOverflowDaysForLastMonth();
-
-        return newSelectedMonth;
-    });
 }
 
 function changeSelectedMonthFromLastMonth(clickElement) {
@@ -110,17 +90,60 @@ function lastMonthHandler() {
     let newNextMonth = date.nextMonthDate = newSelectedMonth;
     nextMonthElement.innerHTML = monthArr[newNextMonth.getMonth() + 1];
 
-    lastMonthOverflowAction(lastMonthOverflowDays);
+    setDaysForMonth(date.selectedDate, dayElementArr);
+    selectElements(dayElementArr, "blue");
+
+    setClassForCurrentMonth();
+
     clearElementArrBackground(dayElementArr, 'lightgray');
     clearElementArrBackground(dayNameElementArr, '#F7817E');
 
-    setDaysForMonth(date.selectedDate);
-    setOverflowDaysForLastMonth();
+    setOverflowDaysForLastMonth(date.lastMonthDate);
     lastMonthOverflowAction(lastMonthOverflowDays);
-    setClassForCurrentMonth();
+
+    setOverflowDaysForNextMonth(date.nextMonthDate);
+    nextMonthOverflowAction(nextMonthOverflowDays);
+
+    changeSelectedMonthFromNextMonth(nextMonthElement);
+    changeSelectedMonthFromLastMonth(lastMonthElement);
 
     return newSelectedMonth;
 }
+
+function nextMonthHandler() {
+    let newSelectedMonth = date.nextMonthDate;
+
+    if (newSelectedMonth.getMonth() === 0) {
+        lastMonthElement.innerHTML = monthArr[11];
+    } else {
+        lastMonthElement.innerHTML = monthArr[newSelectedMonth.getMonth() - 1];
+    }
+    selectedMonthElement.innerHTML = monthArr[newSelectedMonth.getMonth()] + " " + newSelectedMonth.getFullYear();
+
+    let newNextMonth = date.nextMonthDate = newSelectedMonth;
+    nextMonthElement.innerHTML = monthArr[newNextMonth.getMonth() + 1];
+
+    setDaysForMonth(date.selectedDate, dayElementArr);
+    selectElements(dayElementArr, "blue");
+
+    setClassForCurrentMonth();
+
+    clearElementArrBackground(dayElementArr, 'lightgray');
+    clearElementArrBackground(dayNameElementArr, '#F7817E');
+
+    setOverflowDaysForLastMonth(date.lastMonthDate);
+    lastMonthOverflowAction(lastMonthOverflowDays);
+
+
+    setOverflowDaysForNextMonth(date.nextMonthDate);
+    nextMonthOverflowAction(nextMonthOverflowDays);
+
+    changeSelectedMonthFromNextMonth(nextMonthElement);
+    changeSelectedMonthFromLastMonth(lastMonthElement);
+
+    return newSelectedMonth;
+}
+
 
 function lastMonthOverflowAction(elementArr) {
     for (let i = 0; i < elementArr.length; i++) {
@@ -128,6 +151,11 @@ function lastMonthOverflowAction(elementArr) {
     }
 }
 
+function nextMonthOverflowAction(elementArr) {
+    for (let i = 0; i < elementArr.length; i++) {
+        changeSelectedMonthFromNextMonth(elementArr[i]);
+    }
+}
 
 function daysInMonth(date) {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -157,25 +185,24 @@ function setClassForCurrentMonth() {
     for (let i = 0; i < htmlDateArr.length; i++) {
         if (htmlDateArr[i].innerHTML !== '')
             htmlDateArr[i].classList.add("selected-day");
-        }
     }
-
+}
 
 
 function setOverflowDaysForLastMonth() {
-    let monthFirstDay = getDayNumberForFirstOfMonth(date.selectedDate);
-    let monthFullDate = date.selectedDate;
+    let currentMonthFirstDay = getDayNumberForFirstOfMonth(date.selectedDate);
+    let currentMonthFullDate = date.selectedDate;
 
     for (let i = 0; i < dayElementArr.length; i++) {
         dayElementArr[i].className = "day";
         dayElementArr[i].removeEventListener('click', lastMonthHandler);
     }
 
-    if (monthFirstDay !== 0) {
+    if (currentMonthFirstDay !== 0) {
         let lastMonthDaysArr = [];
-        let grabFirstFillDateOfLastMonth = new Date(monthFullDate.getFullYear(), monthFullDate.getMonth(), -monthFirstDay + 1);
+        let grabFirstFillDateOfLastMonth = new Date(currentMonthFullDate.getFullYear(), currentMonthFullDate.getMonth(), -currentMonthFirstDay + 1);
 
-        for (let i = 0; i < monthFirstDay; i++) {
+        for (let i = 0; i < currentMonthFirstDay; i++) {
             let nextDate = new Date(grabFirstFillDateOfLastMonth.getFullYear(), grabFirstFillDateOfLastMonth.getMonth(), grabFirstFillDateOfLastMonth.getDate() + (i));
             lastMonthDaysArr.push(nextDate);
             dayElementArr[i].innerHTML = lastMonthDaysArr[i].getDate();
@@ -186,23 +213,32 @@ function setOverflowDaysForLastMonth() {
 }
 
 function setOverflowDaysForNextMonth() {
-    let thisMonthFirstDay = getDayNumberForFirstOfMonth(date.selectedDate);
-    let currentMonthDate = date.selectedDate;
+    let currentMonthFullDate = date.selectedDate;
+    let dayElementArr = document.getElementsByClassName('day');
+    let nextMonthDaysArr = [];
+    let daysToFillCounter = 0;
 
-    if (thisMonthFirstDay !== 0) {
-        let lastMonthDaysArr = [];
-        let grabFirstFillDateOfLastMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth(), -thisMonthFirstDay + 1);
+    let grabFirstFillDateOfNextMonth = new Date(currentMonthFullDate.getFullYear(), currentMonthFullDate.getMonth() + 1);
 
-        for (let i = 0; i < thisMonthFirstDay; i++) {
-            let nextDate = new Date(grabFirstFillDateOfLastMonth.getFullYear(), grabFirstFillDateOfLastMonth.getMonth(), grabFirstFillDateOfLastMonth.getDate() + (i));
-            lastMonthDaysArr.push(nextDate);
-            dayElementArr[i].innerHTML = lastMonthDaysArr[i].getDate();
-            setBackground(dayElementArr[i], 'darkgray');
-            addClassToElement(dayElementArr[i], 'last-month-overflow');
+    for (let i = 0; i < dayElementArr.length; i++) {
+        dayElementArr[i].className = "day";
+        dayElementArr[i].removeEventListener('click', nextMonthHandler);
+        if (dayElementArr[i].innerHTML === '') {
+            daysToFillCounter += 1;
         }
     }
-}
 
+    for (let i = 0; i < daysToFillCounter; i++) {
+        let nextDate = new Date(grabFirstFillDateOfNextMonth.getFullYear(), grabFirstFillDateOfNextMonth.getMonth(), grabFirstFillDateOfNextMonth.getDate() + (i));
+        nextMonthDaysArr.push(nextDate);
+    }
+
+    for (let i = 0; i < nextMonthDaysArr.length; i++) {
+        dayElementArr[42 - nextMonthDaysArr.length + i].innerHTML = nextMonthDaysArr[i].getDate();
+        setBackground(dayElementArr[42 - nextMonthDaysArr.length + i], 'darkgray');
+        addClassToElement(dayElementArr[42 - nextMonthDaysArr.length + i], 'next-month-overflow');
+    }
+}
 
 //todo move into my date object?
 let dayElementArr = document.getElementsByClassName('day');
@@ -212,6 +248,7 @@ let selectedMonthElement = document.getElementById('selected-month');
 let nextMonthElement = document.getElementById('next-month');
 let lastMonthElement = document.getElementById('last-month');
 let lastMonthOverflowDays = document.getElementsByClassName('last-month-overflow');
+let nextMonthOverflowDays = document.getElementsByClassName('next-month-overflow');
 
 
 // set initial info and allow all day elements to be selected
@@ -221,13 +258,17 @@ lastMonthElement.innerHTML = monthArr[date.lastMonthDate.getMonth()];
 
 setDaysForMonth(date.selectedDate, dayElementArr);
 selectElements(dayElementArr, "blue");
-setOverflowDaysForLastMonth(date.lastMonthDate);
-lastMonthOverflowAction(lastMonthOverflowDays);
+
 setClassForCurrentMonth();
 
+setOverflowDaysForLastMonth(date.lastMonthDate);
+lastMonthOverflowAction(lastMonthOverflowDays);
 
 
-changeSelectedMonthFromNextMonth(selectedMonthElement, nextMonthElement, lastMonthElement, dayElementArr);
+setOverflowDaysForNextMonth(date.nextMonthDate);
+nextMonthOverflowAction(nextMonthOverflowDays);
+
+changeSelectedMonthFromNextMonth(nextMonthElement);
 changeSelectedMonthFromLastMonth(lastMonthElement);
 
 
