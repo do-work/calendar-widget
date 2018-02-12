@@ -36,6 +36,7 @@
 }
 
 .weeksContainer .day,
+.weeksContainer .last-month-overflow,
 .day-name-container .day-name
 {
     width: 12.28%;
