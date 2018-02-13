@@ -17,4 +17,4 @@ JS only:
 
 WORKING DEMO
 ===============================
-https://codepen.io/doWork/pen/yvJxNz
+https://do-work.github.io/calendar-widget/
